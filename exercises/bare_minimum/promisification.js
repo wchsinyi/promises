@@ -26,18 +26,22 @@ var getGitHubProfile = function(user, callback) {
     }
   });
 };
-var getGitHubProfileAsync = (user) => {
-  return new Promise((resolve, reject) => {
-    var cb = function(isError, isData){
-      if (isError===null){
-        resolve(isData);
-      } else{
-        reject(isError);
-      }
-    }
-    getGitHubProfile(user, cb);
-  })
-}; 
+// #### I Use Promisify #########
+var getGitHubProfileAsync = Promise.promisify(getGitHubProfile);
+
+// #### II Define callbacj function #########
+// var getGitHubProfileAsync = (user) => {
+//   return new Promise((resolve, reject) => {
+//     var cb = function(isError, isData){
+//       if (isError===null){
+//         resolve(isData);
+//       } else{
+//         reject(isError);
+//       }
+//     }
+//     getGitHubProfile(user, cb);
+//   })
+// }; 
 
 
 // (2) Asyncronous token generation
@@ -47,19 +51,22 @@ var generateRandomToken = function(callback) {
     callback(null, buffer.toString('hex'));
   });
 };
+// #### I Use Promisify #########
+var generateRandomTokenAsync = Promise.promisify(generateRandomToken);
 
-var generateRandomTokenAsync = ()=>{
-  return new Promise((resolve, reject) => {
-    var cb = function(isError, isData){
-      if (isError===null){
-        resolve(isData);
-      } else{
-        reject(isError);
-      }
-    }
-    generateRandomToken(cb);
-  });
-}; 
+// #### II Define callbacj function #########
+// var generateRandomTokenAsync = ()=>{
+//   return new Promise((resolve, reject) => {
+//     var cb = function(isError, isData){
+//       if (isError===null){
+//         resolve(isData);
+//       } else{
+//         reject(isError);
+//       }
+//     }
+//     generateRandomToken(cb);
+//   });
+// }; 
 
 
 // (3) Asyncronous file manipulation
@@ -74,8 +81,13 @@ var readFileAndMakeItFunny = function(filePath, callback) {
       .join('\n');
 
     callback(funnyFile);
+    // cannot use Promise.pormisift(readFileAndMakeItFunny)
+    // because we do not supply error argument here 
+    // callback(funnyFile) vs callback(err, funnyFile)  
   });
 };
+
+
 Promise.promisifyAll(fs)
 var readFileAndMakeItFunnyAsync = function(filePath){
   return fs.readFileAsync(filePath, 'utf8')
@@ -90,7 +102,6 @@ var readFileAndMakeItFunnyAsync = function(filePath){
   )
 }; 
 
-// var readFileAndMakeItFunnyAsync = Promise.promisify(readFileAndMakeItFunny);
 
 
 // Export these functions so we can test them and reuse them in later exercises
